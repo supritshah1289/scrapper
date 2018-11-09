@@ -39,21 +39,32 @@ def scrapeUrlsOfMoviesByPages(language,fromYear, toYear):
         for url in urls:
             response = requests.get(url, timeout=5)
             soup = BeautifulSoup(response.text, 'lxml')
-            for div in soup.find_all('div', {"class": "block2"}):
-                    movie = {}
-                    a = div.find('a')
-                    h3 = a.find('h3')
-                    movie['url'] = a.attrs['href']
-                    movie['title'] = h3.text
-                    movie['year'] = url[-4:]
-                    movies.append(movie)
-                    time.sleep(10)
-                    print(movie)
+            
+            try:
+                for li in soup.find_all('li'):
+                        print(url)
+                        print("<========================>")
+                        movie = {}
+                        block1 = li.find('div', {"class":"block1"})
+                        a = block1.find('a')['href']
+                        img = block1.find('img')['src']
+                        block2 = li.find('div', {"class":"block2"})
+                        h3 = block2.find('h3')
+
+                        movie['url'] = a
+                        movie['title'] = h3.text
+                        movie['img'] = img
+                        movie['year'] = url[-4:]
+                        movies.append(movie)
+                        time.sleep(10)
+                        print(movie)
+            except:
+                pass
     except:
         pass
     return movies
 
 
-movie = scrapeUrlsOfMoviesByPages('hindi',2018, 1989)
-with open('outputfile_2018_1989_year.json', 'w') as fout:
+movie = scrapeUrlsOfMoviesByPages('hindi',2018, 2016)
+with open('test_file.json', 'w') as fout:
     json.dump(movie, fout)
